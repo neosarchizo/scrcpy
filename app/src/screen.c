@@ -278,30 +278,8 @@ sc_screen_render(struct sc_screen *screen, bool update_content_rect) {
     }
 
     SDL_RenderClear(screen->renderer);
-    if (screen->rotation == 0) {
-        SDL_RenderCopy(screen->renderer, screen->texture, NULL, &screen->rect);
-    } else {
-        // rotation in RenderCopyEx() is clockwise, while screen->rotation is
-        // counterclockwise (to be consistent with --lock-video-orientation)
-        int cw_rotation = (4 - screen->rotation) % 4;
-        double angle = 90 * cw_rotation;
-
-        SDL_Rect *dstrect = NULL;
-        SDL_Rect rect;
-        if (screen->rotation & 1) {
-            rect.x = screen->rect.x + (screen->rect.w - screen->rect.h) / 2;
-            rect.y = screen->rect.y + (screen->rect.h - screen->rect.w) / 2;
-            rect.w = screen->rect.h;
-            rect.h = screen->rect.w;
-            dstrect = &rect;
-        } else {
-            assert(screen->rotation == 2);
-            dstrect = &screen->rect;
-        }
-
-        SDL_RenderCopyEx(screen->renderer, screen->texture, NULL, dstrect,
-                         angle, NULL, 0);
-    }
+    SDL_RenderCopyEx(screen->renderer, screen->texture, NULL, &screen->rect,
+                        0, NULL, SDL_FLIP_HORIZONTAL);
     SDL_RenderPresent(screen->renderer);
 }
 
